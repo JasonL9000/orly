@@ -39,7 +39,7 @@ namespace Base {
     using TEvent = inotify_event;
 
     /* The minimum and default sizes for the event buffer. */
-    static constexpr size_t
+    static constexpr const size_t
         MinBufferSize = sizeof(TEvent) + NAME_MAX + 1,
         DefBufferSize = 0x10000;
 
