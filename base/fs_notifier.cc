@@ -30,7 +30,7 @@ using namespace std;
 using namespace Base;
 using namespace Util;
 
-constexpr size_t
+constexpr const size_t
     TFsNotifier::MinBufferSize,
     TFsNotifier::DefBufferSize;
 
