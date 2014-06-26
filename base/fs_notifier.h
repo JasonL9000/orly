@@ -75,7 +75,8 @@ namespace Base {
     /* Advance to the next event. */
     TFsNotifier &operator++();
 
-    /* Add a new watch or modify an existing one. */
+    /* Add a new watch or modify an existing one.  Return the watch
+       descriptor. */
     int AddWatch(const char *path, uint32_t mask = IN_ALL_EVENTS);
 
     /* The handle to the OS object.  Use this to wait for events. */
@@ -97,10 +98,20 @@ namespace Base {
     /* Remove an existing watch. */
     void RemoveWatch(int wd);
 
+    /* Add a new watch or modify an existing one.  Return the watch
+       descriptor via out-param and return true.  If we cannot add the watch
+       (which can happen when we are racing against other processes making
+       file system changes), leave the out-param alone and return false. */
+    int TryAddWatch(const char *path, int &wd, uint32_t mask = IN_ALL_EVENTS);
+
     /* The current event.  If there are no events in the buffer, we'll wait
        for some.  However, if this is a non-blocking notifier, we won't wait,
        we'll just return null. */
     const TEvent *TryPeek() const;
+
+    /* Remove an existing watch and return true.  If we fail (possibly because
+       we are racing with the file system), do nothing and return false. */
+    bool TryRemoveWatch(int wd);
 
     private:
 

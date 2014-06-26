@@ -59,12 +59,28 @@ TFsNotifier &TFsNotifier::operator++() {
 
 int TFsNotifier::AddWatch(const char *path, uint32_t mask) {
   assert(this);
-  return IfLt0(inotify_add_watch(Fd, path, mask));
+  int wd;
+  if (!TryAddWatch(path, wd, mask)) {
+    ThrowSystemError(errno);
+  }
+  return wd;
 }
 
 void TFsNotifier::RemoveWatch(int wd) {
   assert(this);
-  IfLt0(inotify_rm_watch(Fd, wd));
+  if (!TryRemoveWatch(wd)) {
+    ThrowSystemError(errno);
+  }
+}
+
+int TFsNotifier::TryAddWatch(const char *path, int &wd, uint32_t mask) {
+  assert(this);
+  int temp = inotify_add_watch(Fd, path, mask);
+  bool success = (temp >= 0);
+  if (success) {
+    wd = temp;
+  }
+  return success;
 }
 
 const TFsNotifier::TEvent *TFsNotifier::TryPeek() const {
@@ -84,6 +100,11 @@ const TFsNotifier::TEvent *TFsNotifier::TryPeek() const {
   }
   return (Cursor < Limit)
       ? reinterpret_cast<inotify_event *>(Cursor) : nullptr;
+}
+
+bool TFsNotifier::TryRemoveWatch(int wd) {
+  assert(this);
+  return inotify_rm_watch(Fd, wd) >= 0;
 }
 
 ostream &operator<<(ostream &strm, const inotify_event &event) {
