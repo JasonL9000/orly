@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   THandlerInstaller handle_sigint(SIGINT);
   TMasker mask_all_but_sigint(*TSet(TSet::Exclude, { SIGINT }));
   /* Make an el-fake-o importer. */
-  TDoNothingImporter my_bg_importer((argc >= 2) ? argv[1] : "./");
+  TDoNothingImporter bg_importer((argc >= 2) ? argv[1] : "./");
   /* Wait to be told to stop. */
   pause();
   return EXIT_SUCCESS;
